@@ -198,7 +198,7 @@ class FilterSystemd(JournalFilter): # pragma: systemd no cover
 					ja.get('flags', 0), ja.get('path'), ja.get('files'), ja.get('namespace'))
 			except:
 				# cannot reopen in that way, so simply recreate reader:
-				self.closeJournal()
+				self._closeJournal()
 				self.__journal = journal.Reader(**self.__jrnlargs)
 		# restore journalmatch specified for the jail:
 		self._resetJournalMatches()
@@ -537,7 +537,7 @@ class FilterSystemd(JournalFilter): # pragma: systemd no cover
 		logSys.debug("[%s] filter exited (systemd)", self.jailName)
 		return True
 
-	def closeJournal(self):
+	def _closeJournal(self):
 		try:
 			jnl, self.__journal = self.__journal, None
 			if jnl:
@@ -568,8 +568,9 @@ class FilterSystemd(JournalFilter): # pragma: systemd no cover
 
 	def afterStop(self):
 		"""Cleanup"""
-		# close journal:
-		self.closeJournal()
+		with self.__lock:
+			# close journal:
+			self._closeJournal()
 		# ensure positions of pending logs are up-to-date:
 		if self._pendDBUpdates and self.jail.database:
 			self._updateDBPending()
