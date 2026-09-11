@@ -60,11 +60,11 @@ def _globJournalFiles(flags=None, path=None):
 		"""add journal files to set corresponding path and flags (without rotated *@*.journal)"""
 		# system journal:
 		if (flags is None) or (flags & journal.SYSTEM_ONLY):
-			filesSet |= set(glob(_join(p,'system.journal'))) - set(glob(_join(p,'system*@*.journal')))
+			filesSet |= set(glob(_join(p,'system.journal')))
 		# current user-journal:
 		if (flags is not None) and (flags & journal.CURRENT_USER):
 			uid = os.geteuid()
-			filesSet |= set(glob(_join(p,('user-%s.journal' % uid)))) - set(glob(_join(p,('user-%s@*.journal' % uid))))
+			filesSet |= set(glob(_join(p,('user-%s.journal' % uid))))
 		# all local journals:
 		if (flags is None) or not (flags & (journal.SYSTEM_ONLY|journal.CURRENT_USER)):
 			filesSet |= set(glob(_join(p,'*.journal'))) - set(glob(_join(p,'*@*.journal')))
